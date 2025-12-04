@@ -1,0 +1,12 @@
+[
+    {
+        "TS_types": [
+            "Valid",
+            "Edge",
+            "Error",
+            "Spaces",
+            "Edge/Error",
+            "Invalid"
+        ]
+    }
+]
