@@ -2,7 +2,7 @@ from langchain_core.prompts import ChatPromptTemplate
 
 def rephraseDBresults(DBresp):
     template = """
-        Create Test scenarios for the following context and give the response in serial numbers:
+        Consider yourself as a QA tester, create Test scenarios in one line for the following context and give the response in serial numbers wise:
 
         {context}
 
@@ -27,7 +27,7 @@ def typeofTS(TS_list):
     template = """
         Give me the what is the type of each test scenarios 1 to {tot_scenarios} given below. Use minimum words separated by ",".
         [Example] 
-        Types: x,x,x... and so on. Where x is type of test scenario.
+        Types: x,x,x... and so on. Where x is type of test scenario. Total no. of types must be {tot_scenarios}
         ---
         [Test scenarios]
         {TS_text}
@@ -57,9 +57,9 @@ def makeCorrection(LLM_TS, suggestion="Make the test scenarios for in-depth test
 
 def basedOnFBTS(DBresp, positive_list, negative_list):
     template = """
-        Create Test scenarios for the following context and give the response in serial numbers:
-        Include these test scenarios : {pos_fb}
-        Do not include test scenario : {neg_fb}
+        Consider yourself as a QA tester, create Test scenarios in one line for the following context and give the response in serial numbers wise:
+        Include these test scenarios on the following types : {pos_fb}
+        Do not include test scenario on the following types : {neg_fb}
         ----
         
         {context}
