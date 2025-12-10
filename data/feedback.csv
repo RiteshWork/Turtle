@@ -1,0 +1,8 @@
+summary_input_file,user_feedback,scenario_type
+ ,1,network case
+ ,0,error case
+ ,1,Valid
+ ,1,Invalid
+ ,1,Network
+ ,1,Empty
+ ,1,Special
