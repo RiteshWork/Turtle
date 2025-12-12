@@ -69,10 +69,44 @@ def basedOnFBTS(DBresp, positive_list, negative_list):
     """
     context_text = "\n\n---\n\n".join([doc.page_content for doc, _score in DBresp])
     pos_fb_cont = ",".join([fb for fb in positive_list])
-    neg_fb_cont = ",".join([fb for fb in positive_list])
+    neg_fb_cont = ",".join([fb for fb in negative_list])
     prompt_template = ChatPromptTemplate.from_template(template)
     prompt = prompt_template.format(pos_fb=pos_fb_cont, neg_fb=neg_fb_cont ,context=context_text)
     return prompt
+
+def onePrompt(DBresp, positive_list, negative_list):
+    template = """Consider yourself as a QA tester, give me Test scenarios and its types based on the context below.
+    Include Test scenario of the following types : {pos_fb}
+    Do not include Test scenarios of the following types: {neg_fb}
+    You can provide other test scenarios with its types if you have any test scenanrios types in mind or if I am missing any.
+    
+    ---
+    [Context]
+
+    {context}
+
+    ---
+        
+    [Important!!] Can you give the "Test scenarios" and "Types" only in JSON format. As per below is the example.
+    
+    
+    [Example]
+    [   
+        {{
+            "Data":[[<Test Scenario>,<Type>], [<Test Scenario>,<Type>], [<Test Scenario>,<Type>]]
+        }}
+    ]
+   
+"""
+    context_text = "\n\n---\n\n".join([doc.page_content for doc, _score in DBresp])
+    pos_fb_cont = ",".join([fb for fb in positive_list])
+    neg_fb_cont = ",".join([fb for fb in negative_list])
+    prompt_template = ChatPromptTemplate.from_template(template)
+    prompt = prompt_template.format(pos_fb = pos_fb_cont, neg_fb = neg_fb_cont, context=context_text)
+
+    return prompt
+
+
 
 def modORDel(feedback):
     template = """

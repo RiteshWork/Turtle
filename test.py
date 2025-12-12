@@ -1,67 +1,80 @@
+import json
 def testScenariosToList(TS):
-    filteredTS_list = []
-    temp_TS = ""
-    len_TS = len(TS)
-    i = 0
-    while i < len_TS:
-        ch1 = TS[i]
-        if ch1.isnumeric() and TS[i+1] == '.':
-            #d_TS = TS[i:]
-            temp_TS = ""
-            other_num = False
-            j = i
-            num_text = ""
-            while j < len_TS:
-                ch2 = TS[j]
-                if not other_num or not ch2.isnumeric():
-                    if ch2.isnumeric() and TS[j+1]:
-                        num_text += ch2
-                    else:
-                        temp_TS += ch2
-                        other_num  = True
-                elif other_num and ch2.isnumeric():
-                    break
-                j += 1
-            i = j-1
-        if len(temp_TS) > 0:
-            filteredTS_list.append(temp_TS)
-        i += 1
-    if len(temp_TS) > 0:
-        last_index = temp_TS.rfind("\n")
-        if last_index > -1:
-            temp_TS = temp_TS[:last_index]
-            filteredTS_list.append(temp_TS)
-        else:
-            filteredTS_list.append(temp_TS)
-    return filteredTS_list
+    s_splitter = '['
+    e_splitter = ']'
+    start_index = TS.find(s_splitter)
+    end_index = TS.rfind(e_splitter)
+    scenario_types = []
+    test_scenarios = []
+    if start_index > -1 and end_index > -1:
+        str_dump = TS[start_index : end_index + 1]
+        js_list = json.loads(str_dump)
+
+        for dic_str in js_list:
+            try:
+                ts_t_list = dic_str['Data']
+            except:
+                ts_t_list = dic_str['data']
+            for ts, tp in ts_t_list:
+                test_scenarios.append(ts)
+                scenario_types.append(tp)
+    return test_scenarios, scenario_types
+
+    #    while temp_str.find('{')
+    #    s_splitter = '{'
+    #    e_splitter = '}'
+    #    split_text(s_splitter, e_splitter)
+    #    dict_str = json.loads(str_dump)
+    #    try:
+    #        ts_t_list = dict_str['Data']
+    #    except:
+    #        ts_t_list = dict_str['data']
+    #    for d1, d2 in ts_t_list:
+    #        test_scenarios.append(d1)
+    #        scenario_types.append(d2)
+    #return test_scenarios, scenario_types
+
+    
 
 
 if __name__ == "__main__":
     TS = """
-**Valid Input, Network Connectivity**
+Here are the test scenarios and types in JSON format:
 
-1. User input: "google"
-Expected output: The program prints a fully qualified domain name (FQDN) like "www.google.com" and attempts to perform a DNS lookup using socket library.
-2. User input: "microsoft"
-Expected output: Same as scenario 1.
+```
+[
+  {
+    "Data": [
+      ["Constructing hostname with invalid prefix", "Boundary Testing"],
+      ["Validating domain name without www prefix", "Equivalence Partitioning"],
+      ["Checking IP address retrieval for valid FQDN", "Error Guessing"]
+    ]
+  },
+  {
+    "Data": [
+      ["Handling empty input from user", "Boundary Testing"],
+      ["Invalid domain name with special characters", "Equivalence Partitioning"],
+      ["DNS lookup failure due to network issue", "Error Guessing"]
+    ]
+  }
+]
+```
 
-**Invalid Input**
+These test scenarios and types are based on the provided context, including:
 
-3. User input: "" (empty string)
-Expected output: The program prints an error message saying "Input cannot be empty."
-4. User input: " invalid" (non-existent domain name)
-Expected output: The program attempts to perform a DNS lookup, but since the domain name is invalid, it will print an error message like "❌ Error: Hostname 'www.invalid.com' could not be resolved." and suggest checking the domain name or network connection.
+* Constructing a hostname with an invalid prefix (boundary testing)
+* Validating a domain name without the www prefix (equivalence partitioning)
+* Checking IP address retrieval for a valid FQDN (error guessing)
 
-**Network Connectivity Issues**
+Additionally, I've included some more test scenarios that cover various edge cases and potential issues:
 
-5. User input: "google" (while running the program on a machine with no internet connectivity)
-Expected output: The program attempts to perform a DNS lookup, but since there is no internet connectivity, it will print an error message like "❌ Error: Hostname 'www.google.com' could not be resolved." and suggest checking the domain name or network connection.
-
-Note that I did not include test scenarios for valid input with network issues because the problem description does not specify this scenario explicitly.
+* Handling empty input from the user (boundary testing)
+* Invalid domain name with special characters (equivalence partitioning)
+* DNS lookup failure due to a network issue (error guessing)
 """
 
-    ts_list = testScenariosToList(TS)
+    ts_list, ts_types = testScenariosToList(TS)
     ts_list = [t.replace(". ", "") for t in ts_list]
     for i in range(len(ts_list)):
-        print(f"{i}. {ts_list[i]}")
+        print(f"{i+1}. {ts_list[i]} -> {ts_types[i]}")
 
