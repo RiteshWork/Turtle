@@ -10,12 +10,12 @@ from datetime import datetime
 # Query DB to get data now
 def selectFromDB():
     mySQL = MSQL_H()
-    summ_list, fb_list, type_list = mySQL.selectAll()
-    return summ_list, fb_list, type_list
+    summ_list, fb_list, type_list, filename_list = mySQL.selectAll()
+    return summ_list, fb_list, type_list, filename_list
 
 # Get positive negative feedback types for DB query.
 def getPosNegTypesDB():
-    types_list, summ_inp, db_0_1_list = selectFromDB()
+    types_list, summ_inp, db_0_1_list, filename_list = selectFromDB()
     pos_list = []
     neg_list = []
     for i in range(len(db_0_1_list)):
@@ -26,9 +26,9 @@ def getPosNegTypesDB():
     return pos_list, neg_list
         
 # Insert into DB
-def insertToDB(TS_types, summ_input_file, user_feedback):
+def insertToDB(TS_types, summ_input_file, user_feedback, filename):
     mySQL = MSQL_H()
-    mySQL.insertDB(TS_types, summ_input_file, user_feedback)
+    mySQL.insertDB(TS_types, summ_input_file, user_feedback, filename)
 
 ## Get desired subtexts from the large text 
 def getTypesText(text, toSearch):
@@ -167,6 +167,7 @@ user_input = input("Please enter your query: ")
 ## Make DB request, rephrase the text and invoke to LLM.
 print("Trying the get data from vector DB..",end='\r')
 db_results = v_db.query_text(user_input)
+#print(db_results)
 print("Received data from vector DB.          ")
 #useJson = True
 #useCSV = True
@@ -309,7 +310,10 @@ for i in range(len(filteredTS_list)):
 
 ## Save to MySQL DB
 summary_input_file = [' ' for _ in range(len(filteredTS_list))]
-insertToDB(types_list, summary_input_file, db_0_1_list)
+db_data_1, score_ = db_results[0]
+fn = db_data_1.metadata['source'].replace("\\","/")
+filename = [fn for i in range(len(types_list))]
+insertToDB(types_list, summary_input_file, db_0_1_list, filename)
 
 print("\n --- Final feedback --- \n")
 final_feedback = input("Did you like the Test scenarios over all yes/no: ").strip().lower()

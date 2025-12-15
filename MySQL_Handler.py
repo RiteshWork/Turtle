@@ -4,8 +4,10 @@ from mysql.connector import Error
 class MySQL_Handler:
 #CREATE TABLE feedbacks (
 #	SCENARIO_TYPE CHAR(20) PRIMARY KEY NOT NULL,
-#   SUMMARY_INPUT_FILE VARCHAR(50),
-#   USER_FEEDBACK CHAR(1)
+#   SUMMARY_INPUT_FILE VARCHAR(100),
+#   USER_FEEDBACK CHAR(1),
+#   FILENAME CHAR(100),
+#   CONSTRAINT unique_index UNIQUE (SCENARIO_TYPE, FILENAME)
 #);
 
     def __init__(self):
@@ -13,6 +15,7 @@ class MySQL_Handler:
         self.summ_list = []
         self.fb_list = []
         self.type_list = []
+        self.filename_list = []
 
         # DB variables
         self.host = 'localhost'
@@ -39,10 +42,10 @@ class MySQL_Handler:
         else:
             print("Unable to conncet to MYSQL database.")
 
-    def insertDB(self, types_list, summ_list, user_fb_list):
+    def insertDB(self, types_list, summ_list, user_fb_list, filename_list):
         v_row_list = []
-        temp_q = """INSERT INTO feedbacks (SCENARIO_TYPE, SUMMARY_INPUT_FILE, USER_FEEDBACK) 
-        VALUES (%s, %s, %s)
+        temp_q = """INSERT INTO feedbacks (SCENARIO_TYPE, SUMMARY_INPUT_FILE, USER_FEEDBACK, FILENAME) 
+        VALUES (%s, %s, %s, %s)
         ON DUPLICATE KEY UPDATE
         SUMMARY_INPUT_FILE = VALUES(SUMMARY_INPUT_FILE),
         USER_FEEDBACK = VALUES(USER_FEEDBACK)
@@ -52,7 +55,8 @@ class MySQL_Handler:
             summ_ = summ_list[i]
             u_fb = user_fb_list[i]
             t_type = types_list[i]
-            temp_row = [t_type, summ_, u_fb]
+            filename = filename_list[i]
+            temp_row = [t_type, summ_, u_fb, filename]
             tup_row = tuple(temp_row)
             
             v_row_list.append(tup_row)
@@ -77,22 +81,23 @@ class MySQL_Handler:
 
     def selectQuery(self):
         query = """
-            SELECT SCENARIO_TYPE, SUMMARY_INPUT_FILE, USER_FEEDBACK
+            SELECT SCENARIO_TYPE, SUMMARY_INPUT_FILE, USER_FEEDBACK, FILENAME
                 FROM feedbacks;
         """
         self.cursor.execute(query)
         rows = self.cursor.fetchall()
         
         for row in rows:
-            temp_type, temp_summ, temp_fb = row
+            temp_type, temp_summ, temp_fb, temp_fn = row
             self.type_list.append(temp_type)
             self.summ_list.append(temp_summ)
             self.fb_list.append(temp_fb)
+            self.filename_list.append(temp_fn)
     
     def selectAll(self):
         if len(self.summ_list) == 0 and len(self.fb_list) == 0 and len(self.type_list) == 0:
             self.selectQuery()
-        return self.type_list, self.summ_list, self.fb_list
+        return self.type_list, self.summ_list, self.fb_list, self.filename_list
 
 if __name__ == "__main__":
     mysqlH = MySQL_Handler()

@@ -87,7 +87,7 @@ def onePrompt(DBresp, positive_list, negative_list):
 
     ---
         
-    [Important!!] Can you give the "Test scenarios" and "Types" only in JSON format. As per below is the example.
+    [Important!!] Can you give the "Test scenarios" and "Types" only in JSON format without any comments. As per below is the example.
     
     
     [Example]
